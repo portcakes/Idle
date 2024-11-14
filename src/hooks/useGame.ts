@@ -165,62 +165,77 @@ export const useGame = () => {
     });
   }, [getResource]);
 
-  const upgradeBuilding = useCallback((buildingName: string) => {
-    const building = buildings.find(b => b.name === buildingName);
-    if (!building || !canAffordUpgrade(building)) return;
-
-    Object.entries(building.cost).forEach(([resource, cost]) => {
-      updateResource(resource, -cost);
+  const upgradeBuilding = (buildingName: string) => {
+    setBuildings((prevBuildings) => {
+      return prevBuildings.map((building) => {
+        if (building.name === buildingName) {
+          // If the building isn't built yet, this is initial construction
+          if (!building.isBuilt) {
+            return {
+              ...building,
+              isBuilt: true,
+              level: 1,
+              lastProduced: Date.now()
+            };
+          }
+          // If it's already built, this is an upgrade
+          return {
+            ...building,
+            level: building.level + 1,
+            lastProduced: Date.now()
+          };
+        }
+        return building;
+      });
     });
 
-    setBuildings(prev => 
-      prev.map(b => b.name === buildingName ? {
-        ...b,
-        level: b.level + 1,
-        cost: Object.fromEntries(
-          Object.entries(b.cost).map(([r, c]) => [r, Math.ceil(c * 1.5)])
-        ),
-      } : b)
-    );
-  }, [buildings, canAffordUpgrade, updateResource]);
+    // Deduct resources for the building cost
+    setResources((prevResources) => {
+      const building = buildings.find((b) => b.name === buildingName);
+      if (!building) return prevResources;
+
+      const cost = building.cost;
+      return prevResources.map((resource) => {
+        const costAmount = cost[resource.name as keyof typeof cost];
+        if (costAmount) {
+          return {
+            ...resource,
+            amount: resource.amount - costAmount * Math.pow(building.multiplier, building.level - 1)
+          };
+        }
+        return resource;
+      });
+    });
+  };
 
   // Building production
   useEffect(() => {
     const interval = setInterval(() => {
-      setBuildings(prev => prev.map(building => {
-        if (!building.produces || !building.unlocked) return building;
-
-        const now = Date.now();
-        const timeSinceProduction = now - building.lastProduced;
-        const cycleProgress = timeSinceProduction / building.produces.interval;
-
-        if (cycleProgress >= 1) {
-          building.produces.resources.forEach(({ name, amount, consumes }) => {
-            if (consumes) {
-              const resource = getResource(consumes.resource);
-              if (!resource || resource.amount < consumes.amount) return;
-              updateResource(consumes.resource, -consumes.amount);
+      setBuildings((prevBuildings) =>
+        prevBuildings.map((building) => {
+          if (building.unlocked && building.isBuilt) {
+            const now = Date.now();
+            const timeSinceLastProduction = now - building.lastProduced;
+            
+            if (timeSinceLastProduction >= building.produces.interval) {
+              // Produce resources here
+              building.produces.resources.forEach(({ name, amount }) => {
+                updateResource(name, amount * building.level);
+              });
+              
+              return {
+                ...building,
+                lastProduced: now
+              };
             }
-            const outputAmount = amount * building.multiplier;
-            updateResource(name, outputAmount);
-          });
-
-          return {
-            ...building,
-            lastProduced: now,
-            productionProgress: 0,
-          };
-        }
-
-        return {
-          ...building,
-          productionProgress: cycleProgress,
-        };
-      }));
-    }, 100);
+          }
+          return building;
+        })
+      );
+    }, 1000);
 
     return () => clearInterval(interval);
-  }, [getResource, updateResource]);
+  }, [updateResource]);
 
   // Resource depletion
   useEffect(() => {
@@ -259,7 +274,7 @@ export const useGame = () => {
 
           resources.forEach(resource => {
             if (resource.name !== 'guards') {
-              const loss = resource.amount * 0.2 * lossMultiplier;
+              const loss = resource.amount * 1 * lossMultiplier;
               updateResource(resource.name, -loss);
             }
           });
@@ -297,6 +312,10 @@ export const useGame = () => {
     setTaskSlots(prev => prev + 1);
   }, [taskSlots, canAffordNextSlot, getNextSlotCost, updateResource]);
 
+  const updateResources = (newResources: Resource[]) => {
+    setResources(newResources);
+  };
+
   return {
     resources,
     buildings,
@@ -311,5 +330,6 @@ export const useGame = () => {
     getNextSlotCost,
     canAffordNextSlot,
     purchaseTaskSlot,
+    updateResources,
   };
 };

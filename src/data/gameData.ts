@@ -14,13 +14,14 @@ export const INITIAL_RESOURCES: Resource[] = [
   { name: 'wool', amount: 15, perClick: 1, perSecond: 0, depletionRate: 10, lastDepleted: Date.now(), category: 'raw' },
   { name: 'meat', amount: 15, perClick: 1, perSecond: 0, depletionRate: 12, lastDepleted: Date.now(), category: 'raw' },
   { name: 'furs', amount: 10, perClick: 1, perSecond: 0, depletionRate: 10, lastDepleted: Date.now(), category: 'raw' },
-  
+  { name: 'coal', amount: 10, perClick: 0, perSecond: 0, depletionRate: 10, lastDepleted: Date.now(), category: 'raw' },
   // Refined Resources
   { name: 'metal', amount: 15, perClick: 0, perSecond: 0, depletionRate: 5, lastDepleted: Date.now(), category: 'refined' },
   { name: 'precious metal', amount: 5, perClick: 0, perSecond: 0, depletionRate: 3, lastDepleted: Date.now(), category: 'refined' },
   { name: 'cloth', amount: 10, perClick: 0, perSecond: 0, depletionRate: 8, lastDepleted: Date.now(), category: 'refined' },
   { name: 'food', amount: 25, perClick: 0, perSecond: 0, depletionRate: 15, lastDepleted: Date.now(), category: 'refined' },
   { name: 'ale', amount: 10, perClick: 0, perSecond: 0, depletionRate: 20, lastDepleted: Date.now(), category: 'refined' },
+  { name: 'glass', amount: 10, perClick: 0, perSecond: 0, depletionRate: 10, lastDepleted: Date.now(), category: 'refined' },
   
   // Luxury Resources
   { name: 'coins', amount: 100, perClick: 0, perSecond: 0, depletionRate: 5, lastDepleted: Date.now(), category: 'luxury' },
@@ -28,7 +29,8 @@ export const INITIAL_RESOURCES: Resource[] = [
   { name: 'fine jewelry', amount: 0, perClick: 0, perSecond: 0, depletionRate: 3, lastDepleted: Date.now(), category: 'luxury' },
   { name: 'fine garb', amount: 0, perClick: 0, perSecond: 0, depletionRate: 5, lastDepleted: Date.now(), category: 'luxury' },
   { name: 'exotic spices', amount: 0, perClick: 0, perSecond: 0, depletionRate: 8, lastDepleted: Date.now(), category: 'luxury' },
-  { name: 'exotic furs', amount: 0, perClick: 0, perSecond: 0, depletionRate: 5, lastDepleted: Date.now(), category: 'luxury' }
+  { name: 'exotic furs', amount: 0, perClick: 0, perSecond: 0, depletionRate: 5, lastDepleted: Date.now(), category: 'luxury' },
+  { name: 'stardust', amount: 0, perClick: 0, perSecond: 0, depletionRate: 0, lastDepleted: Date.now(), category: 'luxury' }
 ];
 
 export const INITIAL_BUILDINGS: Building[] = [
@@ -44,7 +46,9 @@ export const INITIAL_BUILDINGS: Building[] = [
     },
     lastProduced: Date.now(),
     productionProgress: 0,
-    unlocked: true
+    unlocked: true,
+    toUnlockCost: {},
+    isBuilt: true
   },
   {
     name: 'Lumber Yard',
@@ -58,7 +62,9 @@ export const INITIAL_BUILDINGS: Building[] = [
     },
     lastProduced: Date.now(),
     productionProgress: 0,
-    unlocked: true
+    unlocked: true,
+    toUnlockCost: {},
+    isBuilt: false
   },
   {
     name: "Hunter's Guild",
@@ -75,7 +81,9 @@ export const INITIAL_BUILDINGS: Building[] = [
     },
     lastProduced: Date.now(),
     productionProgress: 0,
-    unlocked: true
+    unlocked: true,
+    toUnlockCost: {},
+    isBuilt: false
   },
   {
     name: 'Mineshaft',
@@ -87,13 +95,16 @@ export const INITIAL_BUILDINGS: Building[] = [
       resources: [
         { name: 'stone', amount: 2 },
         { name: 'raw gems', amount: 0.5 },
-        { name: 'raw ores', amount: 1 }
+        { name: 'raw ores', amount: 1 },
+        { name: 'coal', amount: 1 }
       ],
       interval: 10000
     },
     lastProduced: Date.now(),
     productionProgress: 0,
-    unlocked: true
+    unlocked: true,
+    toUnlockCost: {},
+    isBuilt: false
   },
   {
     name: 'Farm',
@@ -111,7 +122,9 @@ export const INITIAL_BUILDINGS: Building[] = [
     },
     lastProduced: Date.now(),
     productionProgress: 0,
-    unlocked: true
+    unlocked: true,
+    toUnlockCost: {},
+    isBuilt: false
   },
   {
     name: 'Forge',
@@ -122,14 +135,16 @@ export const INITIAL_BUILDINGS: Building[] = [
     produces: {
       resources: [
         { name: 'metal', amount: 1, consumes: { resource: 'raw ores', amount: 2 } },
-        { name: 'precious metal', amount: 0.2, consumes: { resource: 'raw ores', amount: 3 } },
+        { name: 'precious metal', amount: 1, consumes: { resource: 'raw ores', amount: 3 } },
         { name: 'coins', amount: 1, consumes: { resource: 'metal', amount: 1 } }
       ],
       interval: 12000
     },
     lastProduced: Date.now(),
     productionProgress: 0,
-    unlocked: true
+    unlocked: true,
+    toUnlockCost: {},
+    isBuilt: false
   },
   {
     name: 'Barracks',
@@ -143,12 +158,14 @@ export const INITIAL_BUILDINGS: Building[] = [
     },
     lastProduced: Date.now(),
     productionProgress: 0,
-    unlocked: true
+    unlocked: true,
+    toUnlockCost: {},
+    isBuilt: false
   },
   {
     name: 'Jeweler',
     level: 1,
-    cost: { wood: 30, stone: 25, precious_metal: 5 },
+    cost: { wood: 30, stone: 25, 'precious metal': 5 },
     multiplier: 1.2,
     description: 'Crafts fine jewelry and processes gems',
     produces: {
@@ -160,7 +177,9 @@ export const INITIAL_BUILDINGS: Building[] = [
     },
     lastProduced: Date.now(),
     productionProgress: 0,
-    unlocked: true
+    unlocked: true,
+    toUnlockCost: {},
+    isBuilt: false
   },
   {
     name: 'Seamstress',
@@ -177,9 +196,108 @@ export const INITIAL_BUILDINGS: Building[] = [
     },
     lastProduced: Date.now(),
     productionProgress: 0,
-    unlocked: true
+    unlocked: true,
+    toUnlockCost: {},
+    isBuilt: false
+  },
+  {
+    name: 'Marketplace',
+    level: 1,
+    cost: { wood: 30, stone: 25, cloth: 10, coins: 10 },
+    multiplier: 1.2,
+    description: 'Trades goods with other kingdoms',
+    produces: {
+      resources: [{ name: 'exotic spices', amount: 1 }, { name: 'exotic furs', amount: 1 }, { name: 'meat', amount: 1 }, { name: 'coins', amount: 1 }],
+      interval: 15000
+    },
+    lastProduced: Date.now(),
+    productionProgress: 0,
+    unlocked: true,
+    toUnlockCost: {},
+    isBuilt: false
+  },
+  {
+    name: 'Tavern',
+    level: 1,
+    cost: { wood: 20, stone: 15, food: 10 },
+    multiplier: 1.15,
+    description: 'Serves ale and food to the citizens',
+    produces: {
+      resources: [{ name: 'ale', amount: 1 }, { name: 'food', amount: 1 }],
+      interval: 10000
+    },
+    lastProduced: Date.now(),
+    productionProgress: 0,
+    unlocked: true,
+    toUnlockCost: {},
+    isBuilt: false
+  },
+  {
+    name: 'Docks',
+    level: 1,
+    cost: { wood: 30, stone: 25, cloth: 10, coins: 10 },
+    multiplier: 1.2,
+    description: 'Trades goods with other kingdoms',
+    produces: {
+      resources: [{ name: 'coins', amount: 1 }, { name: 'exotic furs', amount: 1 }, { name: 'exotic spices', amount: 1 }, { name: 'meat', amount: 1 }],
+      interval: 15000
+    },
+    lastProduced: Date.now(),
+    productionProgress: 0,
+    unlocked: true,
+    toUnlockCost: {},
+    isBuilt: false
+  },
+  {
+    name: 'Castle',
+    level: 1,
+    cost: { wood: 30, stone: 25, metal: 10, coins: 10 },
+    multiplier: 1.2,
+    description: 'Protects the kingdom from invaders',
+    produces: {
+      resources: [{ name: 'coins', amount: 10 }],
+      interval: 15000
+    },
+    lastProduced: Date.now(),
+    productionProgress: 0,
+    unlocked: false,
+    toUnlockCost: { coins: 100, metal: 100, stone: 100, wood: 50 },
+    isBuilt: false
+  },
+  {
+    name: 'Airship',
+    level: 1,
+    cost: { wood: 100, stone: 100, metal: 100, coins: 100 },
+    multiplier: 1.2,
+    description: 'Fly to other kingdoms and beyond',
+    produces: {
+      resources: [{ name: 'coins', amount: 100, }, {name: 'stardust', amount: 1}],
+      interval: 15000
+    },
+    consumes: [{ name: 'coal', amount: 1 }],
+    lastProduced: Date.now(),
+    productionProgress: 0,
+    unlocked: false,
+    toUnlockCost: { coins: 1000, metal: 100, stone: 100, wood: 50 },
+    isBuilt: false
+  },
+  {
+    name: 'Cathedral',
+    level: 1,
+    cost: { wood: 100, stone: 100, metal: 100, coins: 100 },
+    multiplier: 1.2,
+    description: 'A place of worship for the citizens',
+    produces: {
+      resources: [{ name: 'coins', amount: 100 }],
+      interval: 15000
+    },
+    lastProduced: Date.now(),
+    productionProgress: 0,
+    unlocked: false,
+    toUnlockCost: { coins: 1000, metal: 100, stone: 100, wood: 50, glass: 10 },
+    isBuilt: false
   }
-];
+  ];
 
 export const ALL_TASKS: Task[] = [
   {
@@ -328,6 +446,83 @@ export const ALL_TASKS: Task[] = [
     difficulty: 1,
     icon: 'Coins',
     unlocked: true
+  },
+  {
+    id: '15',
+    name: 'Brew Ale',
+    produces: [{ resource: 'ale', amount: 1 }],
+    consumes: [{ resource: 'hops', amount: 1 }],
+    baseOutput: 1,
+    difficulty: 2,
+    icon: 'Beer',
+    unlocked: true
+  },
+  {
+    id: '16',
+    name: 'Bake Bread',
+    produces: [{ resource: 'food', amount: 1 }],
+    baseOutput: 1,
+    difficulty: 2,
+    icon: 'Croissant',
+    unlocked: true
+  },
+  {
+    id: '17',
+    name: 'Cook Meat',
+    produces: [{ resource: 'food', amount: 1 }, { resource: 'coins', amount: 1 }],
+    consumes: [{ resource: 'meat', amount: 1 }],
+    baseOutput: 1,
+    difficulty: 2,
+    icon: 'Beef',
+    unlocked: true
+  },
+  {
+    id: '18',
+    name: 'Feed Citizens',
+    produces: [{ resource: 'citizens', amount: 1 }, { resource: 'coins', amount: 2 }],
+    consumes: [{ resource: 'food', amount: 1 }],
+    baseOutput: 1,
+    difficulty: 1,
+    icon: 'Croissant',
+    unlocked: true
+  },
+  {
+    id: '19',
+    name: 'Hire Guards',
+    produces: [{ resource: 'guards', amount: 1 }],
+    consumes: [{ resource: 'coins', amount: 5 }],
+    baseOutput: 1,
+    difficulty: 2,
+    icon: 'Shield',
+    unlocked: true
+  },
+  {
+    id: '20',
+    name: '"Hire" Citizens',
+    produces: [{ resource: 'citizens', amount: 1 }],
+    consumes: [{ resource: 'coins', amount: 5 }],
+    baseOutput: 1,
+    difficulty: 2,
+    icon: 'Coins',
+    unlocked: true
+  },
+  {
+    id: '21',
+    name: 'Make Glass',
+    produces: [{ resource: 'glass', amount: 1 }],
+    baseOutput: 1,
+    difficulty: 2,
+    icon: 'Square-Dashed',
+    unlocked: true
+  },
+  {
+    id: '22',
+    name: 'Mine Coal',
+    produces: [{ resource: 'coal', amount: 1 }],
+    baseOutput: 1,
+    difficulty: 2,
+    icon: 'Mountain',
+    unlocked: true
   }
 ];
 
@@ -335,3 +530,4 @@ function getResourceAmount(resourceName: string): number {
   const resource = INITIAL_RESOURCES.find(r => r.name === resourceName);
   return resource ? resource.amount : 0;
 }
+

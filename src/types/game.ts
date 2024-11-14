@@ -14,7 +14,7 @@ export interface Building {
   cost: { [key: string]: number };
   multiplier: number;
   description: string;
-  produces?: {
+  produces: {
     resources: Array<{
       name: string;
       amount: number;
@@ -25,6 +25,10 @@ export interface Building {
   lastProduced: number;
   productionProgress: number;
   unlocked: boolean;
+  toUnlockCost: { [key: string]: number };
+  isBuilt: boolean;
+  constructionTime?: number;
+  consumes?: Array<{ name: string; amount: number }>;
 }
 
 export interface Task {
@@ -44,3 +48,7 @@ export interface Task {
   icon: string;
   unlocked: boolean;
 }
+
+export type IconName = 'Axe' | 'Pickaxe' | 'Hammer' | 'Diamond' | 'Wheat' | 'Target' | 
+                      'Flame' | 'Coins' | 'Shield' | 'Gem' | 'Scissors' | 'ShoppingBag' | 
+                      'Beer' | 'Bed' | 'Utensils';

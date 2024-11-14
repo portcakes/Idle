@@ -13,9 +13,8 @@ export const TaskButton: React.FC<TaskButtonProps> = ({
   onClick,
   resources,
 }) => {
-  const IconComponent = Icons[
-    task.icon as keyof typeof Icons
-  ] as React.ElementType;
+  const IconComponent = (Icons[task.icon as keyof typeof Icons] ||
+    Icons.HelpCircle) as React.ElementType;
 
   const canAfford = React.useMemo(() => {
     if (!task.consumes) return true;
