@@ -6,32 +6,99 @@ const STORAGE_KEY = 'kingdom-builder-save';
 const DEPLETION_INTERVAL = 15000; // 15 seconds
 const RAID_INTERVAL = 60000; // 60 seconds
 const TASK_REFRESH_INTERVAL = 15000; // 15 seconds
+const RESET_KEY = 'kingdom-builder-reset';
+const BASE_TASK_SLOTS = 3;
+const MAX_TASK_SLOTS = 10;
+const TASK_SLOT_COST = 100; // Base cost in coins
+
+const resetGameState = () => {
+  // Clear ALL storage
+  localStorage.clear();
+  sessionStorage.clear();
+  // Set reset flag
+  sessionStorage.setItem(RESET_KEY, 'true');
+  window.location.reload();
+};
 
 export const useGame = () => {
-  const [resources, setResources] = useState<Resource[]>(INITIAL_RESOURCES);
-  const [buildings, setBuildings] = useState<Building[]>(INITIAL_BUILDINGS);
-  const [lastRaid, setLastRaid] = useState<number>(Date.now());
-  const [unlockedTasks] = useState<string[]>(ALL_TASKS.filter(t => t.unlocked).map(t => t.id));
-  const [availableTasks, setAvailableTasks] = useState<Task[]>([]);
-  const [lastTaskRefresh, setLastTaskRefresh] = useState<number>(Date.now());
+  const [resources, setResources] = useState<Resource[]>(() => {
+    if (sessionStorage.getItem(RESET_KEY)) {
+      return INITIAL_RESOURCES.map(resource => ({
+        ...resource,
+        lastDepleted: Date.now()
+      }));
+    }
 
-  // Load saved game state
-  useEffect(() => {
     const savedState = localStorage.getItem(STORAGE_KEY);
     if (savedState) {
       const parsed = JSON.parse(savedState);
-      setResources(parsed.resources.map((r: Resource) => ({
+      return parsed.resources.map((r: Resource) => ({
         ...r,
         lastDepleted: Date.now(),
-      })));
-      setBuildings(parsed.buildings.map((b: Building) => ({
+      }));
+    }
+    return INITIAL_RESOURCES.map(resource => ({
+      ...resource,
+      lastDepleted: Date.now()
+    }));
+  });
+
+  const [buildings, setBuildings] = useState<Building[]>(() => {
+    if (sessionStorage.getItem(RESET_KEY)) {
+      return INITIAL_BUILDINGS.map(building => ({
+        ...building,
+        lastProduced: Date.now(),
+        productionProgress: 0
+      }));
+    }
+
+    const savedState = localStorage.getItem(STORAGE_KEY);
+    if (savedState) {
+      const parsed = JSON.parse(savedState);
+      return parsed.buildings.map((b: Building) => ({
         ...b,
         lastProduced: Date.now(),
         productionProgress: 0,
-      })));
-      setLastRaid(parsed.lastRaid);
+      }));
     }
-  }, []);
+    return INITIAL_BUILDINGS.map(building => ({
+      ...building,
+      lastProduced: Date.now(),
+      productionProgress: 0
+    }));
+  });
+
+  const [lastRaid, setLastRaid] = useState<number>(() => {
+    if (sessionStorage.getItem(RESET_KEY)) {
+      return Date.now();
+    }
+
+    const savedState = localStorage.getItem(STORAGE_KEY);
+    if (savedState) {
+      const parsed = JSON.parse(savedState);
+      return parsed.lastRaid;
+    }
+    return Date.now();
+  });
+
+  const [unlockedTasks] = useState<string[]>(ALL_TASKS.filter(t => t.unlocked).map(t => t.id));
+  const [taskSlots, setTaskSlots] = useState<number>(() => {
+    if (sessionStorage.getItem(RESET_KEY)) {
+      return BASE_TASK_SLOTS;
+    }
+    const savedState = localStorage.getItem(STORAGE_KEY);
+    if (savedState) {
+      const parsed = JSON.parse(savedState);
+      return parsed.taskSlots || BASE_TASK_SLOTS;
+    }
+    return BASE_TASK_SLOTS;
+  });
+  const [availableTasks, setAvailableTasks] = useState<Task[]>(() => {
+    const unlockedTasksList = ALL_TASKS.filter(t => t.unlocked);
+    const shuffled = [...unlockedTasksList].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, taskSlots);
+  });
+  const [lastTaskRefresh, setLastTaskRefresh] = useState<number>(Date.now());
 
   // Save game state
   useEffect(() => {
@@ -40,9 +107,10 @@ export const useGame = () => {
       buildings,
       lastRaid,
       unlockedTasks,
+      taskSlots,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(gameState));
-  }, [resources, buildings, lastRaid, unlockedTasks]);
+  }, [resources, buildings, lastRaid, unlockedTasks, taskSlots]);
 
   // Randomize tasks
   useEffect(() => {
@@ -51,16 +119,14 @@ export const useGame = () => {
       if (now - lastTaskRefresh >= TASK_REFRESH_INTERVAL) {
         const unlockedTasksList = ALL_TASKS.filter(t => unlockedTasks.includes(t.id));
         const shuffled = [...unlockedTasksList].sort(() => Math.random() - 0.5);
-        setAvailableTasks(shuffled.slice(0, 3));
+        setAvailableTasks(shuffled.slice(0, taskSlots));
         setLastTaskRefresh(now);
       }
     };
 
-    refreshTasks(); // Initial task set
     const interval = setInterval(refreshTasks, 1000); // Check every second
-
     return () => clearInterval(interval);
-  }, [unlockedTasks, lastTaskRefresh]);
+  }, [unlockedTasks, lastTaskRefresh, taskSlots]);
 
   const getResource = useCallback((name: string) => {
     return resources.find(r => r.name === name);
@@ -206,6 +272,31 @@ export const useGame = () => {
     return () => clearInterval(interval);
   }, [buildings, lastRaid, resources, getResource, updateResource]);
 
+  // Clear reset flag after initialization
+  useEffect(() => {
+    if (sessionStorage.getItem(RESET_KEY)) {
+      sessionStorage.removeItem(RESET_KEY);
+    }
+  }, []);
+
+  const getNextSlotCost = useCallback(() => {
+    if (taskSlots >= MAX_TASK_SLOTS) return Infinity;
+    return Math.floor(TASK_SLOT_COST * Math.pow(1.5, taskSlots - BASE_TASK_SLOTS));
+  }, [taskSlots]);
+
+  const canAffordNextSlot = useCallback(() => {
+    const coins = getResource('coins');
+    return coins && coins.amount >= getNextSlotCost();
+  }, [getResource, getNextSlotCost]);
+
+  const purchaseTaskSlot = useCallback(() => {
+    if (taskSlots >= MAX_TASK_SLOTS || !canAffordNextSlot()) return;
+    
+    const cost = getNextSlotCost();
+    updateResource('coins', -cost);
+    setTaskSlots(prev => prev + 1);
+  }, [taskSlots, canAffordNextSlot, getNextSlotCost, updateResource]);
+
   return {
     resources,
     buildings,
@@ -214,5 +305,11 @@ export const useGame = () => {
     upgradeBuilding,
     canAffordUpgrade,
     lastRaid,
+    resetGame: resetGameState,
+    taskSlots,
+    maxTaskSlots: MAX_TASK_SLOTS,
+    getNextSlotCost,
+    canAffordNextSlot,
+    purchaseTaskSlot,
   };
 };

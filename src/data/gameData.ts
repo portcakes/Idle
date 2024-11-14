@@ -8,8 +8,8 @@ export const INITIAL_RESOURCES: Resource[] = [
   // Raw Resources
   { name: 'wood', amount: 50, perClick: 1, perSecond: 0, depletionRate: 8, lastDepleted: Date.now(), category: 'raw' },
   { name: 'stone', amount: 30, perClick: 1, perSecond: 0, depletionRate: 8, lastDepleted: Date.now(), category: 'raw' },
-  { name: 'raw_ores', amount: 20, perClick: 1, perSecond: 0, depletionRate: 10, lastDepleted: Date.now(), category: 'raw' },
-  { name: 'raw_gems', amount: 10, perClick: 0.5, perSecond: 0, depletionRate: 12, lastDepleted: Date.now(), category: 'raw' },
+  { name: 'raw ores', amount: 20, perClick: 1, perSecond: 0, depletionRate: 10, lastDepleted: Date.now(), category: 'raw' },
+  { name: 'raw gems', amount: 10, perClick: 0.5, perSecond: 0, depletionRate: 12, lastDepleted: Date.now(), category: 'raw' },
   { name: 'hops', amount: 15, perClick: 1, perSecond: 0, depletionRate: 15, lastDepleted: Date.now(), category: 'raw' },
   { name: 'wool', amount: 15, perClick: 1, perSecond: 0, depletionRate: 10, lastDepleted: Date.now(), category: 'raw' },
   { name: 'meat', amount: 15, perClick: 1, perSecond: 0, depletionRate: 12, lastDepleted: Date.now(), category: 'raw' },
@@ -17,18 +17,18 @@ export const INITIAL_RESOURCES: Resource[] = [
   
   // Refined Resources
   { name: 'metal', amount: 15, perClick: 0, perSecond: 0, depletionRate: 5, lastDepleted: Date.now(), category: 'refined' },
-  { name: 'precious_metal', amount: 5, perClick: 0, perSecond: 0, depletionRate: 3, lastDepleted: Date.now(), category: 'refined' },
+  { name: 'precious metal', amount: 5, perClick: 0, perSecond: 0, depletionRate: 3, lastDepleted: Date.now(), category: 'refined' },
   { name: 'cloth', amount: 10, perClick: 0, perSecond: 0, depletionRate: 8, lastDepleted: Date.now(), category: 'refined' },
   { name: 'food', amount: 25, perClick: 0, perSecond: 0, depletionRate: 15, lastDepleted: Date.now(), category: 'refined' },
   { name: 'ale', amount: 10, perClick: 0, perSecond: 0, depletionRate: 20, lastDepleted: Date.now(), category: 'refined' },
   
   // Luxury Resources
   { name: 'coins', amount: 100, perClick: 0, perSecond: 0, depletionRate: 5, lastDepleted: Date.now(), category: 'luxury' },
-  { name: 'precious_gems', amount: 0, perClick: 0, perSecond: 0, depletionRate: 2, lastDepleted: Date.now(), category: 'luxury' },
-  { name: 'fine_jewelry', amount: 0, perClick: 0, perSecond: 0, depletionRate: 3, lastDepleted: Date.now(), category: 'luxury' },
-  { name: 'fine_garb', amount: 0, perClick: 0, perSecond: 0, depletionRate: 5, lastDepleted: Date.now(), category: 'luxury' },
-  { name: 'exotic_spices', amount: 0, perClick: 0, perSecond: 0, depletionRate: 8, lastDepleted: Date.now(), category: 'luxury' },
-  { name: 'exotic_furs', amount: 0, perClick: 0, perSecond: 0, depletionRate: 5, lastDepleted: Date.now(), category: 'luxury' }
+  { name: 'precious gems', amount: 0, perClick: 0, perSecond: 0, depletionRate: 2, lastDepleted: Date.now(), category: 'luxury' },
+  { name: 'fine jewelry', amount: 0, perClick: 0, perSecond: 0, depletionRate: 3, lastDepleted: Date.now(), category: 'luxury' },
+  { name: 'fine garb', amount: 0, perClick: 0, perSecond: 0, depletionRate: 5, lastDepleted: Date.now(), category: 'luxury' },
+  { name: 'exotic spices', amount: 0, perClick: 0, perSecond: 0, depletionRate: 8, lastDepleted: Date.now(), category: 'luxury' },
+  { name: 'exotic furs', amount: 0, perClick: 0, perSecond: 0, depletionRate: 5, lastDepleted: Date.now(), category: 'luxury' }
 ];
 
 export const INITIAL_BUILDINGS: Building[] = [
@@ -86,8 +86,8 @@ export const INITIAL_BUILDINGS: Building[] = [
     produces: {
       resources: [
         { name: 'stone', amount: 2 },
-        { name: 'raw_gems', amount: 0.5 },
-        { name: 'raw_ores', amount: 1 }
+        { name: 'raw gems', amount: 0.5 },
+        { name: 'raw ores', amount: 1 }
       ],
       interval: 10000
     },
@@ -121,8 +121,8 @@ export const INITIAL_BUILDINGS: Building[] = [
     description: 'Smelts ore into metal',
     produces: {
       resources: [
-        { name: 'metal', amount: 1, consumes: { resource: 'raw_ores', amount: 2 } },
-        { name: 'precious_metal', amount: 0.2, consumes: { resource: 'raw_ores', amount: 3 } },
+        { name: 'metal', amount: 1, consumes: { resource: 'raw ores', amount: 2 } },
+        { name: 'precious metal', amount: 0.2, consumes: { resource: 'raw ores', amount: 3 } },
         { name: 'coins', amount: 1, consumes: { resource: 'metal', amount: 1 } }
       ],
       interval: 12000
@@ -153,8 +153,8 @@ export const INITIAL_BUILDINGS: Building[] = [
     description: 'Crafts fine jewelry and processes gems',
     produces: {
       resources: [
-        { name: 'precious_gems', amount: 1, consumes: { resource: 'raw_gems', amount: 2 } },
-        { name: 'fine_jewelry', amount: 0.5, consumes: { resource: 'precious_metal', amount: 1 } }
+        { name: 'precious gems', amount: 1, consumes: { resource: 'raw gems', amount: 2 } },
+        { name: 'fine jewelry', amount: 0.5, consumes: { resource: 'precious metal', amount: 1 } }
       ],
       interval: 12000
     },
@@ -171,7 +171,7 @@ export const INITIAL_BUILDINGS: Building[] = [
     produces: {
       resources: [
         { name: 'cloth', amount: 1, consumes: { resource: 'wool', amount: 1 } },
-        { name: 'fine_garb', amount: 0.5, consumes: { resource: 'cloth', amount: 2 } }
+        { name: 'fine garb', amount: 0.5, consumes: { resource: 'cloth', amount: 2 } }
       ],
       interval: 10000
     },
@@ -203,7 +203,7 @@ export const ALL_TASKS: Task[] = [
   {
     id: '3',
     name: 'Mine Ores',
-    produces: [{ resource: 'raw_ores', amount: 1 }],
+    produces: [{ resource: 'raw ores', amount: 1 }],
     baseOutput: 1,
     difficulty: 3,
     icon: 'Hammer',
@@ -212,7 +212,7 @@ export const ALL_TASKS: Task[] = [
   {
     id: '4',
     name: 'Mine Gems',
-    produces: [{ resource: 'raw_gems', amount: 0.5 }],
+    produces: [{ resource: 'raw gems', amount: 0.5 }],
     baseOutput: 0.5,
     difficulty: 4,
     icon: 'Diamond',
@@ -249,7 +249,7 @@ export const ALL_TASKS: Task[] = [
       { resource: 'metal', amount: 1 },
       { resource: 'precious_metal', amount: 0.2, chance: 0.1 }
     ],
-    consumes: [{ resource: 'raw_ores', amount: 2 }],
+    consumes: [{ resource: 'raw ores', amount: 2 }],
     baseOutput: 1,
     difficulty: 3,
     icon: 'Flame',
@@ -278,8 +278,8 @@ export const ALL_TASKS: Task[] = [
   {
     id: '10',
     name: 'Polish Gems',
-    produces: [{ resource: 'precious_gems', amount: 1 }],
-    consumes: [{ resource: 'raw_gems', amount: 2 }],
+    produces: [{ resource: 'precious gems', amount: 1 }],
+    consumes: [{ resource: 'raw gems', amount: 2 }],
     baseOutput: 1,
     difficulty: 4,
     icon: 'Gem',
@@ -306,6 +306,24 @@ export const ALL_TASKS: Task[] = [
     baseOutput: 1,
     difficulty: 3,
     icon: 'ShoppingBag',
+    unlocked: true
+  },
+  {
+    id: '13',
+    name: 'Shear Sheep',
+    produces: [{ resource: 'wool', amount: 1 }],
+    baseOutput: 1,
+    difficulty: 3,
+    icon: 'Scissors',
+    unlocked: true
+  },
+  {
+    id: '14',
+    name: 'Tax Citizens',
+    produces: [{ resource: 'coins', amount: 1 }],
+    baseOutput: 1,
+    difficulty: 1,
+    icon: 'Coins',
     unlocked: true
   }
 ];

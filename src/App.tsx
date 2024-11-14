@@ -1,26 +1,34 @@
-import React from 'react';
-import { ResourceGrid } from './components/ResourceGrid';
-import { TaskButton } from './components/TaskButton';
-import { BuildingGrid } from './components/BuildingGrid';
-import { RaidTimer } from './components/RaidTimer';
-import { useGame } from './hooks/useGame';
-import { Trash2 } from 'lucide-react';
+import { ResourceGrid } from "./components/ResourceGrid";
+import { TaskButton } from "./components/TaskButton";
+import { BuildingGrid } from "./components/BuildingGrid";
+import { RaidTimer } from "./components/RaidTimer";
+import { useGame } from "./hooks/useGame";
+import { Trash2 } from "lucide-react";
 
 function App() {
-  const { 
-    resources, 
-    buildings, 
-    availableTasks, 
-    handleTask, 
-    upgradeBuilding, 
-    canAffordUpgrade, 
-    lastRaid 
+  const {
+    resources,
+    buildings,
+    availableTasks,
+    handleTask,
+    upgradeBuilding,
+    canAffordUpgrade,
+    lastRaid,
+    resetGame,
+    taskSlots,
+    maxTaskSlots,
+    getNextSlotCost,
+    canAffordNextSlot,
+    purchaseTaskSlot,
   } = useGame();
 
   const handleResetGame = () => {
-    if (window.confirm('Are you sure you want to reset your progress? This cannot be undone.')) {
-      localStorage.removeItem('kingdom-builder-save');
-      window.location.reload();
+    if (
+      window.confirm(
+        "Are you sure you want to reset your progress? This cannot be undone."
+      )
+    ) {
+      resetGame();
     }
   };
 
@@ -37,18 +45,33 @@ function App() {
             Reset Progress
           </button>
         </div>
-        
-        <ResourceGrid resources={resources} />
-        
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="bg-black/30 backdrop-blur-sm p-6 rounded-xl">
-            <h2 className="text-2xl font-semibold mb-4">Available Tasks</h2>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-semibold">Available Tasks</h2>
+              {taskSlots < maxTaskSlots && (
+                <button
+                  onClick={purchaseTaskSlot}
+                  disabled={!canAffordNextSlot()}
+                  className={`px-3 py-1 rounded-lg text-sm ${
+                    canAffordNextSlot()
+                      ? "bg-green-600 hover:bg-green-700"
+                      : "bg-gray-600 cursor-not-allowed"
+                  }`}
+                  title={`Cost: ${getNextSlotCost()} coins`}
+                >
+                  Upgrade ({taskSlots}/{maxTaskSlots})
+                </button>
+              )}
+            </div>
             <div className="grid gap-4">
-              {availableTasks.map(task => (
+              {availableTasks.map((task) => (
                 <TaskButton
                   key={task.id}
                   task={task}
                   onClick={() => handleTask(task)}
+                  resources={resources}
                 />
               ))}
             </div>
@@ -62,8 +85,9 @@ function App() {
             />
           </div>
         </div>
+        <ResourceGrid resources={resources} />
       </div>
-      
+
       <RaidTimer lastRaid={lastRaid} />
     </div>
   );
