@@ -116,7 +116,7 @@ export const INITIAL_BUILDINGS: Building[] = [
   {
     name: 'Forge',
     level: 1,
-    cost: { wood: 25, stone: 20, raw_ores: 10 },
+    cost: { wood: 25, stone: 20, 'raw ores': 10 },
     multiplier: 1.2,
     description: 'Smelts ore into metal',
     produces: {
@@ -299,8 +299,8 @@ export const ALL_TASKS: Task[] = [
     id: '12',
     name: 'Trade Goods',
     produces: [
-      { resource: 'exotic_spices', amount: 1 },
-      { resource: 'exotic_furs', amount: 0.5 }
+      { resource: 'exotic spices', amount: 1 },
+      { resource: 'exotic furs', amount: 1 }
     ],
     consumes: [{ resource: 'coins', amount: 5 }],
     baseOutput: 1,
@@ -320,10 +320,18 @@ export const ALL_TASKS: Task[] = [
   {
     id: '14',
     name: 'Tax Citizens',
-    produces: [{ resource: 'coins', amount: 1 }],
+    produces: [{ 
+      resource: 'coins', 
+      amount: getResourceAmount('citizens')
+    }],
     baseOutput: 1,
     difficulty: 1,
     icon: 'Coins',
     unlocked: true
   }
 ];
+
+function getResourceAmount(resourceName: string): number {
+  const resource = INITIAL_RESOURCES.find(r => r.name === resourceName);
+  return resource ? resource.amount : 0;
+}
