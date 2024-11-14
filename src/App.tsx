@@ -4,6 +4,7 @@ import { BuildingGrid } from "./components/BuildingGrid";
 import { RaidTimer } from "./components/RaidTimer";
 import { useGame } from "./hooks/useGame";
 import { Trash2 } from "lucide-react";
+import { track } from "@vercel/analytics";
 
 function App() {
   const {
@@ -38,7 +39,10 @@ function App() {
         <div className="flex justify-between items-center">
           <h1 className="text-4xl font-bold">Kingdom Builder</h1>
           <button
-            onClick={handleResetGame}
+            onClick={() => {
+              handleResetGame();
+              track("reset_game");
+            }}
             className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg transition-colors"
           >
             <Trash2 className="w-4 h-4" />
@@ -52,7 +56,10 @@ function App() {
               <h2 className="text-2xl font-semibold">Available Tasks</h2>
               {taskSlots < maxTaskSlots && (
                 <button
-                  onClick={purchaseTaskSlot}
+                  onClick={() => {
+                    purchaseTaskSlot();
+                    track("purchase_task_slot");
+                  }}
                   disabled={!canAffordNextSlot()}
                   className={`px-3 py-1 rounded-lg text-sm ${
                     canAffordNextSlot()
@@ -70,7 +77,10 @@ function App() {
                 <TaskButton
                   key={task.id}
                   task={task}
-                  onClick={() => handleTask(task)}
+                  onClick={() => {
+                    handleTask(task);
+                    track("complete_task", { task: task.name });
+                  }}
                   resources={resources}
                 />
               ))}
